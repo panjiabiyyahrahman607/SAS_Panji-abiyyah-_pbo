@@ -1,0 +1,181 @@
+ackage com.mycompany.sas_panji_pbo;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
+// ================= CLASS INDUK =================
+class Barang {
+
+    private String namaBarang;
+    private int jumlah;
+    private int harga;
+
+    public Barang(String namaBarang, int jumlah, int harga) {
+        this.namaBarang = namaBarang;
+        this.jumlah = jumlah;
+        this.harga = harga;
+    }
+
+    public String getNamaBarang() {
+        return namaBarang;
+    }
+
+    public int getJumlah() {
+        return jumlah;
+    }
+
+    public int getHarga() {
+        return harga;
+    }
+
+    public double hitungDiskon() {
+        return 0;
+    }
+
+    public double totalBayar() {
+        return (jumlah * harga) - hitungDiskon();
+    }
+}
+
+// ================= CLASS TURUNAN =================
+class Makanan extends Barang {
+
+    public Makanan(String namaBarang, int jumlah, int harga) {
+        super(namaBarang, jumlah, harga);
+    }
+
+    @Override
+    public double hitungDiskon() {
+        return (getJumlah() * getHarga()) * 0.10;
+    }
+}
+
+class Minuman extends Barang {
+
+    public Minuman(String namaBarang, int jumlah, int harga) {
+        super(namaBarang, jumlah, harga);
+    }
+
+    @Override
+    public double hitungDiskon() {
+        return (getJumlah() * getHarga()) * 0.05;
+    }
+}
+
+// ================= CLASS UTAMA =================
+public class SAS_PANJI_PBO extends JFrame {
+
+    JLabel lblNama = new JLabel("Nama Barang");
+    JLabel lblJumlah = new JLabel("Jumlah");
+    JLabel lblJenis = new JLabel("Jenis Barang");
+
+    JTextField txtNama = new JTextField();
+    JTextField txtJumlah = new JTextField();
+
+    String[] jenis = {"Makanan", "Minuman"};
+    JComboBox<String> cmbJenis = new JComboBox<>(jenis);
+
+    JButton btnTambah = new JButton("Tambah");
+    JButton btnTotal = new JButton("Hitung Total");
+
+    JTable table;
+    DefaultTableModel model;
+
+    JLabel lblTotal = new JLabel("Total Bayar : Rp 0");
+
+    double grandTotal = 0;
+
+    public SAS_PANJI_PBO() {
+
+        setTitle("Aplikasi Kasir Desktop");
+        setSize(700, 500);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(null);
+
+        lblNama.setBounds(20, 20, 120, 25);
+        txtNama.setBounds(150, 20, 150, 25);
+
+        lblJumlah.setBounds(20, 60, 120, 25);
+        txtJumlah.setBounds(150, 60, 150, 25);
+
+        lblJenis.setBounds(20, 100, 120, 25);
+        cmbJenis.setBounds(150, 100, 150, 25);
+
+        btnTambah.setBounds(20, 150, 120, 30);
+        btnTotal.setBounds(160, 150, 140, 30);
+
+        model = new DefaultTableModel();
+
+        model.addColumn("Nama Barang");
+        model.addColumn("Jenis");
+        model.addColumn("Jumlah");
+        model.addColumn("Harga");
+        model.addColumn("Diskon");
+        model.addColumn("Total");
+
+        table = new JTable(model);
+
+        JScrollPane pane = new JScrollPane(table);
+        pane.setBounds(20, 210, 640, 150);
+
+        lblTotal.setBounds(20, 390, 300, 30);
+
+        add(lblNama);
+        add(txtNama);
+
+        add(lblJumlah);
+        add(txtJumlah);
+
+        add(lblJenis);
+        add(cmbJenis);
+
+        add(btnTambah);
+        add(btnTotal);
+
+        add(pane);
+        add(lblTotal);
+
+        btnTambah.addActionListener(e -> tambahData());
+
+        btnTotal.addActionListener(e -> {
+            lblTotal.setText("Total Bayar : Rp " + grandTotal);
+        });
+
+        setVisible(true);
+    }
+
+    private void tambahData() {
+
+        String namaBarang = txtNama.getText();
+        int jumlah = Integer.parseInt(txtJumlah.getText());
+
+        Barang barang;
+
+        if (cmbJenis.getSelectedItem().equals("Makanan")) {
+            barang = new Makanan(namaBarang, jumlah, 10000);
+        } else {
+            barang = new Minuman(namaBarang, jumlah, 8000);
+        }
+
+        double diskon = barang.hitungDiskon();
+        double total = barang.totalBayar();
+
+        grandTotal += total;
+
+        model.addRow(new Object[]{
+            barang.getNamaBarang(),
+            cmbJenis.getSelectedItem(),
+            barang.getJumlah(),
+            barang.getHarga(),
+            diskon,
+            total
+        });
+
+        txtNama.setText("");
+        txtJumlah.setText("");
+    }
+
+    public static void main(String[] args) {
+        new SAS_PANJI_PBO();
+    }
+}
